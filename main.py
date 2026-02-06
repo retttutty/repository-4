@@ -1,8 +1,11 @@
 from datetime import datetime, timedelta
+import json
+import os
 
 catatan = []
 mapel_favorit = []  # List untuk menyimpan mapel favorit
 target_harian = {"tanggal": "", "target": 0}  # Dictionary untuk menyimpan target harian
+NAMA_FILE = "study_log_data.json"  # Nama file untuk menyimpan data
 
 def tambah_catatan():
     # Meminta input dari pengguna
@@ -346,6 +349,43 @@ def lihat_progress_harian():
         print(f"📝 Masih kurang: {kekurangan} menit ({jam_kurang}j {menit_kurang}m)")
         print(f"Tetap semangat! Lanjutkan belajar untuk mencapai target hari ini.")
 
+def simpan_file():
+    # Menyimpan semua data ke file JSON
+    try:
+        data = {
+            "catatan": catatan,
+            "mapel_favorit": mapel_favorit,
+            "target_harian": target_harian
+        }
+        
+        with open(NAMA_FILE, "w") as file:
+            json.dump(data, file, indent=4)
+        
+        print(f"✓ Data berhasil disimpan ke file '{NAMA_FILE}'!")
+    except Exception as e:
+        print(f"⚠️  Gagal menyimpan data: {str(e)}")
+
+def muat_file():
+    # Memuat data dari file JSON
+    global catatan, mapel_favorit, target_harian
+    
+    try:
+        if os.path.exists(NAMA_FILE):
+            with open(NAMA_FILE, "r") as file:
+                data = json.load(file)
+                catatan = data.get("catatan", [])
+                mapel_favorit = data.get("mapel_favorit", [])
+                target_harian = data.get("target_harian", {"tanggal": "", "target": 0})
+            
+            print(f"✓ Data berhasil dimuat dari file '{NAMA_FILE}'!")
+            print(f"  - Catatan: {len(catatan)} data")
+            print(f"  - Mapel favorit: {len(mapel_favorit)} mapel")
+        else:
+            print(f"ℹ️  File '{NAMA_FILE}' tidak ditemukan. Mulai dengan data baru.")
+    except Exception as e:
+        print(f"⚠️  Gagal memuat data: {str(e)}")
+        print("ℹ️  Program akan dimulai dengan data kosong.")
+
 def menu():
     print("\n=== Study Log App ===")
     print("1. Tambah catatan belajar")
@@ -357,7 +397,15 @@ def menu():
     print("8. Filter catatan per mapel")
     print("9. Atur target harian")
     print("10. Lihat progress harian")
+    print("11. Simpan data ke file")
     print("4. Keluar")
+
+# Auto-load data saat program dimulai
+print("="*60)
+print(" "*15 + "Selamat datang di Study Log App")
+print("="*60)
+muat_file()
+print()
 
 while True:
     menu()
@@ -381,7 +429,11 @@ while True:
         set_target_harian()
     elif pilihan == "10":
         lihat_progress_harian()
+    elif pilihan == "11":
+        simpan_file()
     elif pilihan == "4":
+        print("\nℹ️  Menyimpan data sebelum keluar...")
+        simpan_file()
         print("Terima kasih, terus semangat belajar!")
         break
     else:
