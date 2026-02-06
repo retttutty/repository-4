@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 catatan = []
 mapel_favorit = []  # List baru untuk menyimpan mapel favorit
 
@@ -11,7 +13,8 @@ def tambah_catatan():
     catatan_baru = {
         "mapel": mapel,      # Nama mata pelajaran
         "topik": topik,      # Topik yang dipelajari
-        "durasi": int(durasi) # Waktu dalam menit (diubah ke angka)
+        "durasi": int(durasi), # Waktu dalam menit (diubah ke angka)
+        "tanggal": datetime.now().strftime("%Y-%m-%d") # Tanggal hari ini
     }
     
     # Menambahkan catatan ke dalam list
@@ -143,6 +146,77 @@ def lihat_favorit():
             print(f"   Jumlah topik: {jumlah_topik} topik")
             print("-" * 60)
 
+def ringkasan_mingguan():
+    # Cek apakah ada data catatan
+    if len(catatan) == 0:
+        print("\n⚠️  Belum ada catatan belajar. Tambahkan catatan terlebih dahulu!")
+        return
+    
+    # Dapatkan tanggal hari ini dan awal minggu (Senin)
+    hari_ini = datetime.now().date()
+    awal_minggu = hari_ini - timedelta(days=hari_ini.weekday())
+    akhir_minggu = awal_minggu + timedelta(days=6)
+    
+    # Filter catatan minggu ini
+    catatan_minggu = []
+    for item in catatan:
+        tanggal_catatan = datetime.strptime(item['tanggal'], "%Y-%m-%d").date()
+        if awal_minggu <= tanggal_catatan <= akhir_minggu:
+            catatan_minggu.append(item)
+    
+    # Jika tidak ada catatan minggu ini
+    if len(catatan_minggu) == 0:
+        print(f"\n⚠️  Belum ada catatan belajar minggu ini ({awal_minggu} - {akhir_minggu})")
+        return
+    
+    # Tampilkan ringkasan mingguan
+    print("\n" + "="*60)
+    print(" "*15 + "RINGKASAN BELAJAR MINGGUAN")
+    print("="*60)
+    print(f"Periode: {awal_minggu} sampai {akhir_minggu}")
+    
+    # Hitung total waktu minggu ini
+    total_menit_minggu = sum(item['durasi'] for item in catatan_minggu)
+    jam_minggu = total_menit_minggu // 60
+    menit_minggu = total_menit_minggu % 60
+    
+    print(f"\nTotal waktu belajar: {total_menit_minggu} menit ({jam_minggu}j {menit_minggu}m)")
+    
+    # Breakdown per hari
+    print("\n" + "-"*60)
+    print("Breakdown per hari:")
+    print("-"*60)
+    
+    nama_hari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+    
+    for i in range(7):
+        tanggal = awal_minggu + timedelta(days=i)
+        waktu_hari = sum(item['durasi'] for item in catatan_minggu if datetime.strptime(item['tanggal'], "%Y-%m-%d").date() == tanggal)
+        
+        if waktu_hari > 0:
+            jam_hari = waktu_hari // 60
+            menit_hari = waktu_hari % 60
+            print(f"  {nama_hari[i]} ({tanggal}): {waktu_hari} menit ({jam_hari}j {menit_hari}m)")
+        else:
+            print(f"  {nama_hari[i]} ({tanggal}): - (tidak ada belajar)")
+    
+    # Breakdown per mapel minggu ini
+    print("\n" + "-"*60)
+    print("Breakdown per mapel:")
+    print("-"*60)
+    
+    mapel_waktu = {}
+    for item in catatan_minggu:
+        if item['mapel'] in mapel_waktu:
+            mapel_waktu[item['mapel']] += item['durasi']
+        else:
+            mapel_waktu[item['mapel']] = item['durasi']
+    
+    for mapel, waktu in mapel_waktu.items():
+        jam_mapel = waktu // 60
+        menit_mapel = waktu % 60
+        print(f"  • {mapel}: {waktu} menit ({jam_mapel}j {menit_mapel}m)")
+
 def menu():
     print("\n=== Study Log App ===")
     print("1. Tambah catatan belajar")
@@ -150,6 +224,7 @@ def menu():
     print("3. Total waktu belajar")
     print("5. Kelola mapel favorit")
     print("6. Lihat mapel favorit")
+    print("7. Ringkasan mingguan")
     print("4. Keluar")
 
 while True:
@@ -166,6 +241,8 @@ while True:
         tambah_favorit()
     elif pilihan == "6":
         lihat_favorit()
+    elif pilihan == "7":
+        ringkasan_mingguan()
     elif pilihan == "4":
         print("Terima kasih, terus semangat belajar!")
         break
