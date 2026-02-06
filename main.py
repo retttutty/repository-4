@@ -1,4 +1,15 @@
-catatan = []
+catatan = [
+    {
+        "mapel": "Matematika",
+        "topik": "Persamaan Kuadrat",
+        "durasi": 45
+    },
+    {
+        "mapel": "Fisika",
+        "topik": "Kinematika",
+        "durasi": 60
+    }
+]
 
 def tambah_catatan():
     # Meminta input dari pengguna
@@ -21,7 +32,23 @@ def tambah_catatan():
 
 
 def lihat_catatan():
-    pass
+    # Cek apakah ada data catatan
+    if len(catatan) == 0:
+        print("⚠️  Belum ada catatan belajar. Mulai tambahkan catatan Anda!")
+    else:
+        # Menampilkan semua catatan dengan format rapi
+        print("\n" + "="*60)
+        print(" "*20 + "DAFTAR CATATAN BELAJAR")
+        print("="*60)
+        
+        # Loop untuk menampilkan setiap catatan
+        for nomor, item in enumerate(catatan, 1):
+            print(f"\n{nomor}. Mapel    : {item['mapel']}")
+            print(f"   Topik    : {item['topik']}")
+            print(f"   Durasi   : {item['durasi']} menit")
+            print("-" * 60)
+        
+        print(f"\nTotal catatan: {len(catatan)}")
 
 def total_waktu():
     pass
