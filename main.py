@@ -1,15 +1,4 @@
-catatan = [
-    {
-        "mapel": "Matematika",
-        "topik": "Persamaan Kuadrat",
-        "durasi": 45
-    },
-    {
-        "mapel": "Fisika",
-        "topik": "Kinematika",
-        "durasi": 60
-    }
-]
+catatan = []
 
 def tambah_catatan():
     # Meminta input dari pengguna
@@ -51,7 +40,41 @@ def lihat_catatan():
         print(f"\nTotal catatan: {len(catatan)}")
 
 def total_waktu():
-    pass
+    # Cek apakah ada data catatan
+    if len(catatan) == 0:
+        print("\n⚠️  Belum ada data catatan. Tambahkan catatan terlebih dahulu!")
+    else:
+        # Menghitung total waktu belajar
+        total_menit = sum(item['durasi'] for item in catatan)
+        
+        # Konversi ke jam dan menit
+        jam = total_menit // 60
+        sisa_menit = total_menit % 60
+        
+        # Menampilkan total waktu dengan format rapi
+        print("\n" + "="*60)
+        print(" "*20 + "TOTAL WAKTU BELAJAR")
+        print("="*60)
+        
+        print(f"\nTotal waktu belajar: {total_menit} menit")
+        print(f"Atau: {jam} jam {sisa_menit} menit")
+        
+        # Menghitung total per mapel
+        print("\n" + "-"*60)
+        print("Breakdown per mapel:")
+        print("-"*60)
+        
+        mapel_waktu = {}
+        for item in catatan:
+            if item['mapel'] in mapel_waktu:
+                mapel_waktu[item['mapel']] += item['durasi']
+            else:
+                mapel_waktu[item['mapel']] = item['durasi']
+        
+        for mapel, waktu in mapel_waktu.items():
+            jam_mapel = waktu // 60
+            menit_mapel = waktu % 60
+            print(f"  • {mapel}: {waktu} menit ({jam_mapel}j {menit_mapel}m)")
 
 def menu():
     print("\n=== Study Log App ===")
@@ -75,3 +98,4 @@ while True:
         break
     else:
         print("Pilihan tidak valid")
+
